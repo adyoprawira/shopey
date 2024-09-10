@@ -295,8 +295,7 @@ git push -u origin main
 2. Create new ```README.md``` file
 
 ## Create a diagram that contains the request client to a Django-based web application and the response it gives, and explain the relationship between urls.py, views.py, models.py, and the html file.
-
-![Diagram](https://imgur.com/a/vL10NcL)
+https://imgur.com/a/vL10NcL
 
 
 ## Use of Git in Software Development
