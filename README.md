@@ -294,6 +294,10 @@ git push -u origin main
 1. Go to Github.com
 2. Create new ```README.md``` file
 
+## Create a diagram that contains the request client to a Django-based web application and the response it gives, and explain the relationship between urls.py, views.py, models.py, and the html file.
+
+
+
 ## Use of Git in Software Development
 1. Git tracks changes to files over time. This allows developers to revisit specific versions of the project. So, they can revert to a previous state.
 2. With Git, it is possible tfor multiple developers to collaborate and work on the same project at the same time. It allows each person to have a local copy of the project. Each devs can make changes independently and Git helps in merging changes from different contributors.
