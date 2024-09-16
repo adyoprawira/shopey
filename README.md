@@ -479,3 +479,19 @@ JSON is more popular than XML because it is better suited for the modern web, wh
        path('json/<str:id>/', show_json_by_id, name='show_json_by_id'),
    ]
    ```
+## Access the four URLs in point 2 using Postman, take screenshots of the results in Postman, and add them to README.md.
+
+1. XML
+![image](https://github.com/user-attachments/assets/f38b384b-b7a3-4ae3-b00b-f14f2a1b0116)
+
+2. JSON
+![image](https://github.com/user-attachments/assets/7a365d94-08da-4206-8ea6-ae7d51f0c522)
+
+3. XML by ID
+![image](https://github.com/user-attachments/assets/6b9488f5-19b8-4ad6-aba3-7a875bf618bb)
+
+4. JSON by ID
+![image](https://github.com/user-attachments/assets/976b10fd-60bc-445e-b66a-dfd8284c1c01)
+
+
+
