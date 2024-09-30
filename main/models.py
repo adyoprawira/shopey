@@ -8,4 +8,4 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.IntegerField()
     description = models.TextField()
-    
+    category = models.CharField(max_length=50)
