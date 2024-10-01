@@ -1,3 +1,6 @@
+# Dropdown Link  
+Assignment 5 https://github.com/adyoprawira/shopey/blob/main/README.md#assignment-5
+
 # Assignment 2
 Link: http://adyo-arkan-shopey.pbp.cs.ui.ac.id/
 ## Creating a Django Project
@@ -328,7 +331,7 @@ In my opinion JSON is better for most modern application, for these reasons:
 JSON is more popular than XML because it is better suited for the modern web, where lightweight, fast, and easy-to-handle data formats are preferred. XML is still useful in some legacy systems and when document structure is important, but JSON’s simplicity and performance have made it the default choice for most applications today.
 
 ## Why do we need csrf_token when creating a form in Django? What could happen if we did not use csrf_token on a Django form? How could this be leveraged by an attacker?
-```csrf_token``` is used to protect forms from CSRF (Cross-Site Request Forgery) attacks. CSRF occurs when an attacker tricks a user into unknowingly submitting a form or making a request on a website where they are authenticated, potentially leading to unauthorized actions such as changing account details or making transactions. The ```csrf_token``` acts as a security token that ensures the fomr submission is coming from the legitimate source (the same domain) and not from an external malicious site. It is unique and included in forms, which the server verifies when the form is submitted. If the token is missing or invalid, Django rejects the request, preventing unauthorized form submissions. If a Django form doesn't use ```csrf_token```, then it would be vulnerable to CSRF attacks. This means that an attacker could create a form that mimics legitimate actions such as;
+```csrf_token``` is used to protect forms from CSRF (Cross-Site Request Forgery) attacks. CSRF occurs when an attacker tricks a user into unknowingly submitting a form or making a request on a website where they are authenticated, potentially leading to unauthorized actions such as changing account details or making transactions. The ```csrf_token``` acts as a security token that ensures the form submission is coming from the legitimate source (the same domain) and not from an external malicious site. It is unique and included in forms, which the server verifies when the form is submitted. If the token is missing or invalid, Django rejects the request, preventing unauthorized form submissions. If a Django form doesn't use ```csrf_token```, then it would be vulnerable to CSRF attacks. This means that an attacker could create a form that mimics legitimate actions such as;
    * Changing passwords
    * Transferring funds
    * etc.
@@ -764,5 +767,397 @@ Django uses sessions and cookies to remember logged-in users across multiple req
       DEBUG = not PRODUCTION
    ```
 
-   
+# Assignment 5
+## If there are multiple CSS selectors for an HTML element, explain the priority order of these CSS selectors!
+There are 4 selectors that we can use in CSS. Those are inline styles, ID selectors, classes selectors, and element selectors. The order of priority are;
+1. Inline styles
+2. ID selectors
+3. Classes selector
+4. Element selector
 
+## Why does responsive design become an important concept in web application development? Give examples of applications that have and have not implemented responsive design!
+A responsive web application ensures that it provides an optimal viewing experience across devices, from desktops to mobile phones. With increasing use of mobile devices, it is important to implement responsive design in making a successful web applications. Examples of applications that have not implemented responsive design are old websites, especially those designed in the early 2000s. These websites are built only for desktop viewing and break down on mobile devices.
+
+## Explain the differences between margin, border, and padding, and how to implement these three things!
+1. Margin is the space outside the element. It creates a gap between the element and its neighboring elements.
+2. Border is the border that surrounds the padding and content. It creates a visible line around the element.
+3. The space inside the element between the content and the border. It creates an inner gap between the content and the element's border.
+<br> The content is at the center. The padding surrounds the content. The border surrounds the padding. The margin is the space outside the border, separating this element from others.
+<br> Here's an example on how to implement all three things:
+```
+<div class="box">Hello, world!</div>
+
+<style>
+  .box {
+    margin: 20px;             /* 20px space outside the element */
+    padding: 10px;            /* 10px space inside the element */
+    border: 2px solid black;  /* A 2px solid black border around the element */
+  }
+</style>
+```
+
+## Explain the concepts of flex box and grid layout along with their uses!
+1. Flexbox: Flexbox is a one-dimensional layout model that arranges items either in a row (horizontally) or in a column (vertically).It is designed to distribute space within a container efficiently, even when the size of the container is unknown or dynamic. The uses of flexbox are one-dimensional elements (single row or column elements), and for responsive layouts that can adjust to different screen sizes by resizing.
+2. Grid Layout is a two-dimensional layout system that allows you to define both rows and columns, making it more powerful and flexible for creating complex layouts. The uses of grid layout are for two dimensional layouts (dashboards, web page layouts with headers, sidebars, and footers), complex layouts with precise control over positioning and aligning of elements.
+
+## Explain how you implemented the checklist above step-by-step (not just following the tutorial)!
+### Implement functions to delete and edit products.
+#### Implementing edit function.
+1. Create a new function in ```views.py``` named ```edit_product``` that takes ```request``` and ```id``` as parameter.
+   ```
+   def edit_product(request, id):
+       # Get product entry based on id
+       product = Product.objects.get(pk = id)
+   
+       # Set product entry as an instance of the form
+       form = ProductForm(request.POST or None, instance=product)
+   
+       if form.is_valid() and request.method == "POST":
+           # Save form and return to home page
+           form.save()
+           return HttpResponseRedirect(reverse('main:show_main'))
+   
+       context = {'form': form}
+       return render(request, "edit_product.html", context)
+   ```
+   
+2. Create a new HTML file named ```edit_product.html``` and fill it with:
+   ```
+   {% extends 'base.html' %}
+   {% load static %}
+   {% block meta %}
+   <title>Edit Product</title>
+   {% endblock meta %}
+   
+   {% block content %}
+   {% include 'navbar.html' %}
+   <div class="flex flex-col min-h-screen bg-[#040709]">
+     <div class="container mx-auto px-4 py-8 mt-16 max-w-xl">
+       <h1 class="text-3xl font-bold text-center mb-8 text-white">Edit Product</h1>
+     
+       <div class="bg-white rounded-lg p-6 form-style">
+         <form method="POST" class="space-y-6">
+             {% csrf_token %}
+             {% for field in form %}
+                 <div class="flex flex-col">
+                     <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-gray-700">
+                         {{ field.label }}
+                     </label>
+                     <div class="w-full">
+                         {{ field }}
+                     </div>
+                     {% if field.help_text %}
+                         <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+                     {% endif %}
+                     {% for error in field.errors %}
+                         <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                     {% endfor %}
+                 </div>
+             {% endfor %}
+             <div class="flex justify-center mt-6">
+                 <button type="submit" class="bg-[#0814F1] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#060FB5] transition duration-300 ease-in-out w-full">
+                     Edit Product
+                 </button>
+             </div>
+         </form>
+     </div>
+     </div>
+   </div>
+   {% endblock %}
+   ```
+3. Import ```edit_product``` in ```urls.py```
+   ```from main.views import edit_product```
+4. Add a URL path to ```urlpatterns```
+   ```
+   ...
+   path('edit-product/<uuid:id>', edit_product, name='edit_product'),
+   ...
+   ```
+5. Edit ```main.html``` with the following code
+   ```
+   ...
+   <tr>
+       ...
+       <td>
+           <a href="{% url 'main:edit_product' product_entry.pk %}">
+               <button>
+                   Edit
+               </button>
+           </a>
+       </td>
+   </tr>
+   ...
+   ```
+#### Implementing delete function
+1. Create a new function in ```views.py``` named ```delete_product``` that takes ```request``` and ```id``` as parameter.
+   ```
+   def delete_product(request, id):
+       # Get product based on id
+       product = Product.objects.get(pk = id)
+       # Delete product
+       product.delete()
+       # Return to home page
+       return HttpResponseRedirect(reverse('main:show_main'))
+   ```
+2. Import ```delete_product``` in ```urls.py```
+   ```from main.views import delete_product```
+3. Add a URL path to ```urlpatterns```
+   ```
+   ...
+   path('delete/<uuid:id>', delete_product, name='delete_product'),
+   ...
+   ```
+4. Edit ```main.html``` with the following code
+   ```
+   ...
+   <tr>
+       ...
+       <td>
+           <a href="{% url 'main:edit_mood' mood_entry.pk %}">
+               <button>
+                   Edit
+               </button>
+           </a>
+       </td>
+       <td>
+           <a href="{% url 'main:delete_mood' mood_entry.pk %}">
+               <button>
+                   Delete
+               </button>
+           </a>
+       </td>
+   </tr>
+   ...
+   ```
+###  Customize the login, register, and add product pages to be as attractive as possible.
+#### Customizing the login page.
+1. Create ```login.html```
+2. Change the background login page to black
+   ```
+   {% block content %}
+   <div class="min-h-screen flex items-center justify-center w-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
+   ...
+   ```
+3. Change the text color to be visible (white/gray)
+   ```
+   <h2 class="mt-6 text-center text-white text-3xl font-extrabold text-gray-900">
+        Login to your account
+   </h2>
+   ```
+4.  Complete the code
+   ```
+   {% extends 'base.html' %}
+
+   {% block meta %}
+   <title>Login</title>
+   {% endblock meta %}
+   
+   {% block content %}
+   <div class="min-h-screen flex items-center justify-center w-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
+     <div class="max-w-md w-full space-y-8">
+       <div>
+         <h2 class="mt-6 text-center text-white text-3xl font-extrabold text-gray-900">
+           Login to your account
+         </h2>
+       </div>
+       <form class="mt-8 space-y-6" method="POST" action="">
+         {% csrf_token %}
+         <input type="hidden" name="remember" value="true">
+         <div class="rounded-md shadow-sm -space-y-px">
+           <div>
+             <label for="username" class="sr-only">Username</label>
+             <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-gray-200 focus:border-gray-200 focus:z-10 sm:text-sm" placeholder="Username">
+           </div>
+           <div>
+             <label for="password" class="sr-only">Password</label>
+             <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-gray-200 focus:border-gray-200 focus:z-10 sm:text-sm" placeholder="Password">
+           </div>
+         </div>
+   
+         <div>
+           <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0814F1] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+             Sign in
+           </button>
+         </div>
+       </form>
+   
+       {% if messages %}
+       <div class="mt-4">
+         {% for message in messages %}
+         {% if message.tags == "success" %}
+               <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                   <span class="block sm:inline">{{ message }}</span>
+               </div>
+           {% elif message.tags == "error" %}
+               <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                   <span class="block sm:inline">{{ message }}</span>
+               </div>
+           {% else %}
+               <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                   <span class="block sm:inline">{{ message }}</span>
+               </div>
+           {% endif %}
+         {% endfor %}
+       </div>
+       {% endif %}
+   
+       <div class="text-center mt-4">
+         <p class="text-sm text-gray-200">
+           Don't have an account yet?
+           <a href="{% url 'main:register' %}" class="font-medium text-indigo-200 hover:text-indigo-300">
+               Register Now
+           </a>
+         </p>
+       </div>
+     </div>
+   </div>
+   {% endblock content %}
+   ```
+#### Customizing the register page.
+1. Create ```register.html```
+2. Change the background of the register page to black
+   ```
+   {% block content %}
+   <div class="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
+   ```
+3. Change the text color to be visible (white/gray)
+   ```
+   <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-200">
+        Create your account
+      </h2>
+   </div>
+   ```
+4. Complete the code
+   ```
+   {% extends 'base.html' %}
+
+   {% block meta %}
+   <title>Register</title>
+   {% endblock meta %}
+   
+   {% block content %}
+   <div class="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
+     <div class="max-w-md w-full space-y-8 form-style">
+       <div>
+         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-200">
+           Create your account
+         </h2>
+       </div>
+       <form class="mt-8 space-y-6" method="POST">
+         {% csrf_token %}
+         <input type="hidden" name="remember" value="true">
+         <div class="rounded-md shadow-sm -space-y-px">
+           {% for field in form %}
+             <div class="{% if not forloop.first %}mt-4{% endif %}">
+               <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-gray-200">
+                 {{ field.label }}
+               </label>
+               <div class="relative">
+                 {{ field }}
+                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                   {% if field.errors %}
+                     <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                       <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                     </svg>
+                   {% endif %}
+                 </div>
+               </div>
+               {% if field.errors %}
+                 {% for error in field.errors %}
+                   <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                 {% endfor %}
+               {% endif %}
+             </div>
+           {% endfor %}
+         </div>
+   
+         <div>
+           <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0814F1] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+             Register
+           </button>
+         </div>
+       </form>
+   
+       {% if messages %}
+       <div class="mt-4">
+         {% for message in messages %}
+         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+           <span class="block sm:inline">{{ message }}</span>
+         </div>
+         {% endfor %}
+       </div>
+       {% endif %}
+   
+       <div class="text-center mt-4">
+         <p class="text-sm text-gray-200">
+           Already have an account?
+           <a href="{% url 'main:login' %}" class="font-medium text-indigo-200 hover:text-indigo-300">
+             Login here
+           </a>
+         </p>
+       </div>
+     </div>
+   </div>
+   {% endblock content %}
+   ```
+#### Customizing the product list page.
+1. Change the background color
+2. Change some positioning of buttons
+3. Change button and hover colors
+
+### If there are no products saved in the application, the product list page will display an image and a message that no products are registered.
+Add this code to ```main.html```
+   ```
+   {% if not product_entries %}
+       <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+         <img src="{% static 'image/very-sad.jpg' %}" alt="Sad face" class="w-128 h-64 mb-4"/>
+         <p class="text-center text-gray-600 mt-4">There is no product in Shopey.</p>
+       </div>
+   ...
+   ```
+###  If there are products saved, the product list page will display details of each product using cards (must not be exactly the same as the design in the Tutorial!).
+Add this code to ```main.html``` below the if that was previously created.
+   ```
+   {% else %}
+       <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full">
+         {% for product in product_entries %}
+           {% include 'card_product.html' with product=product %}
+         {% endfor %}
+       </div>
+   {% endif %}
+   ```
+###  For each product card, create two buttons to edit and delete the product on that card!
+Add this code to ```card_product.html```
+   ```
+   <div class="absolute top-10 right-5 flex space-x-1">
+    <a href="{% url 'main:edit_product' product.pk %}" class="bg-[#0814F1] hover:bg-[#060FB5] text-white rounded-full p-2 transition duration-300 shadow-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+      </svg>
+    </a>
+    <a href="{% url 'main:delete_product' product.pk %}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+      </svg>
+    </a>
+  </div>
+   ```
+### Create a navigation bar (navbar) for the features in the application that is responsive to different device sizes, especially mobile and desktop.
+1. Create ```navbar.html```
+2. To make it responsive to different device sizes, use two different sections and use flex.
+   ```
+   <!-- Desktop Menu (Visible on large screens) -->
+            <div class="hidden md:flex items-center space-x-6">
+
+   <!-- Mobile Menu (Hidden by default) -->
+    <div class="mobile-menu hidden md:hidden px-4 w-full bg-[#8B008B]">
+   ```
+3. Add buttons on the navbar by adding
+   ```
+   <div class="hidden md:flex items-center space-x-6">
+                <a href="/" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Home</a>
+                <a href="/" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Products</a>
+                <a href="#" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Categories</a>
+                <a href="#" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Cart</a>
+   ```
