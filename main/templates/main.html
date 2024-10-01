@@ -7,18 +7,11 @@
 
 {% block content %}
 {% include 'navbar.html' %}
-<div class="overflow-x-hidden px-4 md:px-8 pb-8 pt-24 min-h-screen bg-[#040709] flex flex-col">
+<div class="overflow-x-hidden px-4 md:px-8 pb-8 pt-24 min-h-screen bg-[#00254D] flex flex-col">
   <div class="p-2 mb-6 relative">
-    <div class="relative grid grid-cols-1 z-30 md:grid-cols-3 gap-8">
-      {% include "card_info.html" with title='NPM' value=npm %}
+    <div class="relative grid grid-cols-1 z-30 md:grid-cols-7 gap-8">
       {% include "card_info.html" with title='Name' value=name %}
       {% include "card_info.html" with title='Class' value=class %}
-    </div>
-    <div class="w-full px-6 absolute top-[44px] left-0 z-20 hidden md:flex">
-      <div class="w-full min-h-4 bg-[#0814F1]"></div>
-    </div>
-    <div class="h-full w-full py-6 absolute top-0 left-0 z-20 md:hidden flex">
-      <div class="h-full min-w-4 bg-[#0814F1] mx-auto"></div>
     </div>
   </div>
   <div class="px-3 mb-4">
