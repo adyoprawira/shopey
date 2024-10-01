@@ -764,5 +764,38 @@ Django uses sessions and cookies to remember logged-in users across multiple req
       DEBUG = not PRODUCTION
    ```
 
-   
+# Assignment 5
+## If there are multiple CSS selectors for an HTML element, explain the priority order of these CSS selectors!
+There are 4 selectors that we can use in CSS. Those are inline styles, ID selectors, classes selectors, and element selectors. The order of priority are;
+1. Inline styles
+2. ID selectors
+3. Classes selector
+4. Element selector
+
+## Why does responsive design become an important concept in web application development? Give examples of applications that have and have not implemented responsive design!
+A responsive web application ensures that it provides an optimal viewing experience across devices, from desktops to mobile phones. With increasing use of mobile devices, it is important to implement responsive design in making a successful web applications. Examples of applications that have not implemented responsive design are old websites, especially those designed in the early 2000s. These websites are built only for desktop viewing and break down on mobile devices.
+
+## Explain the differences between margin, border, and padding, and how to implement these three things!
+1. Margin is the space outside the element. It creates a gap between the element and its neighboring elements.
+2. Border is the border that surrounds the padding and content. It creates a visible line around the element.
+3. The space inside the element between the content and the border. It creates an inner gap between the content and the element's border.
+<br> The content is at the center. The padding surrounds the content. The border surrounds the padding. The margin is the space outside the border, separating this element from others.
+<br> Here's an example on how to implement all three things:
+```
+<div class="box">Hello, world!</div>
+
+<style>
+  .box {
+    margin: 20px;             /* 20px space outside the element */
+    padding: 10px;            /* 10px space inside the element */
+    border: 2px solid black;  /* A 2px solid black border around the element */
+  }
+</style>
+```
+
+## Explain the concepts of flex box and grid layout along with their uses!
+1. Flexbox: Flexbox is a one-dimensional layout model that arranges items either in a row (horizontally) or in a column (vertically).It is designed to distribute space within a container efficiently, even when the size of the container is unknown or dynamic. The uses of flexbox are one-dimensional elements (single row or column elements), and for responsive layouts that can adjust to different screen sizes by resizing.
+2. Grid Layout is a two-dimensional layout system that allows you to define both rows and columns, making it more powerful and flexible for creating complex layouts. The uses of grid layout are for two dimensional layouts (dashboards, web page layouts with headers, sidebars, and footers), complex layouts with precise control over positioning and aligning of elements.
+
+## Explain how you implemented the checklist above step-by-step (not just following the tutorial)!
 
