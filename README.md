@@ -1,5 +1,5 @@
 # Dropdown Link  
-Assignment 6 https://github.com/adyoprawira/shopey/edit/main/README.md#assignment-6
+Assignment 6 https://github.com/adyoprawira/shopey/blob/main/README.md#assignment-6
 
 # Assignment 2
 Link: http://adyo-arkan-shopey.pbp.cs.ui.ac.id/
