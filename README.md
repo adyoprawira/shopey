@@ -1161,3 +1161,22 @@ Add this code to ```card_product.html```
                 <a href="#" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Categories</a>
                 <a href="#" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#101010]">Cart</a>
    ```
+# Assignment 6
+## Explain the benefits of using JavaScript in developing web applications!
+
+JavaScript is essential in web application development due to its ability to create dynamic, interactive content through real-time DOM manipulation and asynchronous operations, allowing for smoother user experiences without full page reloads. It works across all modern browsers, ensuring cross-platform compatibility, and can be used for both client-side and server-side development with frameworks like React, Angular, and Node.js, enabling full-stack development. JavaScript supports real-time communication with WebSockets, is backed by powerful developer tools for debugging and performance analysis, and benefits from a vast community and rich ecosystem of libraries that accelerate development. Additionally, modern JavaScript engines offer fast execution, and its event-driven architecture is well-suited for responsive interfaces, making it a versatile language for building scalable web applications.
+
+## Explain why we need to use await when we call fetch()! What would happen if we don't use await?
+
+We use ```await``` when calling ```fetch()``` to pause the execution until the promise returned by ```fetch()``` is resolved, allowing us to handle the result immediately. Since ```fetch()``` is asynchronous, without ```await```, the code would continue executing before the data is received, potentially leading to issues like trying to use the response before it's ready. Using ```await``` makes the code easier to read and ensures that subsequent actions dependent on the fetched data occur only after the network request completes. Without ```await```, you would need to use ```.then()``` to handle the resolved promise, which can make the code more complex.
+
+## Why do we need to use the csrf_exempt decorator on the view used for AJAX POST?
+
+We use the csrf_exempt decorator on views handling AJAX POST requests in Django to disable CSRF protection, which is normally applied to prevent cross-site request forgery attacks. AJAX requests may not always include the necessary CSRF token in the headers, especially if not properly configured on the client side, causing Django to reject the request. By using csrf_exempt, we bypass this CSRF check for the specific view, allowing the AJAX request to be processed without the token. However, it's important to ensure that this is done in safe scenarios where the risk of CSRF attacks is minimal.
+
+## On this week's tutorial, the user input sanitization is done in the back-end as well. Why can't the sanitization be done just in the front-end?
+
+User input sanitization should not be done solely on the front-end because client-side code can be easily bypassed or manipulated by malicious users. While front-end validation improves user experience by providing immediate feedback, it cannot be trusted for security since users can disable JavaScript, alter the code, or send requests directly to the server using tools like cURL or Postman. Therefore, back-end sanitization is essential to ensure that any input reaching the server is properly validated and sanitized, protecting the application from attacks such as SQL injection, cross-site scripting (XSS), and other security vulnerabilities.
+
+## Explain how you implemented the checklist above step-by-step (not just following the tutorial)!
+###
