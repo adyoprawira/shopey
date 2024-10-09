@@ -1,5 +1,5 @@
 # Dropdown Link  
-Assignment 5 https://github.com/adyoprawira/shopey/blob/main/README.md#assignment-5
+Assignment 6 https://github.com/adyoprawira/shopey/edit/main/README.md#assignment-6
 
 # Assignment 2
 Link: http://adyo-arkan-shopey.pbp.cs.ui.ac.id/
@@ -1179,4 +1179,296 @@ We use the csrf_exempt decorator on views handling AJAX POST requests in Django 
 User input sanitization should not be done solely on the front-end because client-side code can be easily bypassed or manipulated by malicious users. While front-end validation improves user experience by providing immediate feedback, it cannot be trusted for security since users can disable JavaScript, alter the code, or send requests directly to the server using tools like cURL or Postman. Therefore, back-end sanitization is essential to ensure that any input reaching the server is properly validated and sanitized, protecting the application from attacks such as SQL injection, cross-site scripting (XSS), and other security vulnerabilities.
 
 ## Explain how you implemented the checklist above step-by-step (not just following the tutorial)!
-###
+### Modify the codes in data cards to able to use AJAX GET.
+1. Remove two lines in ```views.py```
+   ```
+   product_entries = Product.objects.filter(user=request.user)
+   ```
+   and
+   ```
+   'product_entries': product_entries,
+   ```
+2. Replace the first line ```show_json``` and ```show_xml``` with;
+   ```
+   data = Product.objects.filter(user=request.user)
+   ```
+3. Remove the ```product_entries``` block that display products when empty.
+   ```
+   ...
+    {% if not product_entries %}
+        <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+            <img src="{% static 'image/very-sad.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+            <p class="text-center text-gray-600 mt-4">No products yet</p>
+        </div>
+    {% else %}
+        <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full">
+            {% for product_entry in product_entries %}
+                {% include 'card_product.html' with product_entry=product_entry %}
+            {% endfor %}
+        </div>
+    {% endif %}
+   ...
+   ```
+4. Replace the just removed code with;
+   ```
+   <div id="product_entry_cards"></div>
+   ```
+5. Add a <script> block before ```{% endblock content %}``` and create a new function named ```getProductEntries```.
+   ```
+   <script>
+     async function getMoodEntries(){
+         return fetch("{% url 'main:show_json' %}").then((res) => res.json())
+     }
+   </script>
+   ```
+6.  Add another function in ```<script>``` block named ```refreshProductEntries``` to refresh products data asynchronously.
+   ```
+   async function refreshProductEntries() {
+       document.getElementById("product_entry_cards").innerHTML = "";
+       document.getElementById("product_entry_cards").className = "";
+       const productEntries = await getProductEntries();
+       let htmlString = "";
+       let classNameString = "";
+   
+       if (productEntries.length === 0) {
+         classNameString = "flex flex-col items-center justify-center min-h-[24rem] p-6";
+         htmlString = `
+           <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+             <img src="{% static 'image/very-sad.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+             <p class="text-center text-gray-600 mt-4">No product yet.</p>
+           </div>
+         `;
+       } else {
+         classNameString = "columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full";
+         productEntries.forEach((item) => {
+           const name = DOMPurify.sanitize(item.fields.name);
+           const description = DOMPurify.sanitize(item.fields.description);
+           const category = DOMPurify.sanitize(item.fields.category);
+   
+           htmlString += `
+             <div class="relative break-inside-avoid">
+               <div class="relative top-5 bg-indigo-200 shadow-md rounded-lg mb-6 break-inside-avoid flex flex-col border-2 border-gray-700 transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                 <div class="bg-black text-gray-200 p-4 rounded-t-lg border-b-2 border-indigo-300">
+                   <h3 class="font-bold text-xl mb-2">${name}</h3>
+                 </div>
+                 <div class="p-4 flex">
+                   <!-- Left section with description and price -->
+                   <div class="w-2/3">
+                     <p class="font-semibold text-lg mb-2">Description</p>
+                     <p class="text-gray-700 mb-2">
+                       <span class="text-gray-700">${description}</span>
+                     </p>
+                     <div class="mt-4">
+                       <p class="text-gray-700 font-semibold mb-2">Price</p>
+                       <div class="relative pt-1">
+                         <div class="flex mb-2 items-center justify-between">
+                           <div>
+                             <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-gray-900 bg-white shadow-lg">
+                               ${item.fields.price}
+                             </span>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                   <!-- Right section with product image -->
+                   <div class="w-1/3">
+                     {% if product.image %}
+                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-auto rounded-lg shadow-xl">
+                     {% else %}
+                     <img src="{% static 'image/no_image.webp' %}" alt="No image available" class="w-full h-auto rounded-lg">
+                     {% endif %}
+                   </div>
+                 </div>
+               </div>
+               <div class="absolute top-10 right-5 flex space-x-1">
+                 <a href="/edit-product/${item.pk}" class="bg-[#0814F1] hover:bg-[#060FB5] text-white rounded-full p-2 transition duration-300 shadow-md">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                   </svg>
+                 </a>
+                 <a href="/delete/${item.pk}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                   </svg>
+                 </a>
+               </div>
+             </div>
+           `;
+         });
+       }
+   ```
+### Create a button that opens a modal with a form for adding a mood entry.
+1. Add this code to implement the Tailwind modal below the ```div``` with the ```id``` ```product_entry_cards``` that have been added previously.
+   ```
+         <div id="crudModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
+          <div id="crudModalContent" class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+              <h3 class="text-xl font-semibold text-gray-900">
+                Add Product
+              </h3>
+              <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="closeModalBtn">
+                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="sr-only">Close modal</span>
+              </button>
+            </div>
+            <!-- Modal body -->
+            <div class="px-6 py-4 space-y-6 form-style">
+              <form id="productEntryForm">
+                <div class="mb-4">
+                  <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                  <input type="text" id="name" name="name" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter your product" required>
+                </div>
+                <div class="mb-4">
+                  <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea id="description" name="description" rows="3" class="mt-1 block w-full h-52 resize-none border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Describe your product" required></textarea>
+                </div>
+                <div class="mb-4">
+                  <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                  <input type="number" id="price" name="price" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" required>
+                </div>
+                <div class="mb-4">
+                  <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                  <select id="category" name="category" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home">Home</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="sports">Sports</option>
+                    <option value="toys">Toys</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 p-6 border-t border-gray-200 rounded-b justify-center md:justify-end">
+              <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg" id="cancelButton">Cancel</button>
+              <button type="submit" id="submitProductEntry" form="productEntryForm" class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+   ```
+2. Add the following JavaScript functions to make the modal work.
+   ```
+   <script>
+   ...
+     const modal = document.getElementById('crudModal');
+     const modalContent = document.getElementById('crudModalContent');
+   
+     function showModal() {
+         const modal = document.getElementById('crudModal');
+         const modalContent = document.getElementById('crudModalContent');
+   
+         modal.classList.remove('hidden'); 
+         setTimeout(() => {
+           modalContent.classList.remove('opacity-0', 'scale-95');
+           modalContent.classList.add('opacity-100', 'scale-100');
+         }, 50); 
+     }
+   
+     function hideModal() {
+         const modal = document.getElementById('crudModal');
+         const modalContent = document.getElementById('crudModalContent');
+   
+         modalContent.classList.remove('opacity-100', 'scale-100');
+         modalContent.classList.add('opacity-0', 'scale-95');
+   
+         setTimeout(() => {
+           modal.classList.add('hidden');
+         }, 150); 
+     }
+   
+     document.getElementById("cancelButton").addEventListener("click", hideModal);
+     document.getElementById("closeModalBtn").addEventListener("click", hideModal);
+   ...
+   </script>
+   ```
+3. Add a button to perform data addition with AJAX
+   ```
+      <button data-modal-target="crudModal" data-modal-toggle="crudModal" class="btn bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
+         Add New Product by AJAX
+       </button>
+   ```
+### Create a new view function to add a new mood entry to the database.
+1. Import ```csrf_exempt``` and ```require_POST``` to ```views.py```
+   ```
+   from django.views.decorators.csrf import csrf_exempt
+   from django.views.decorators.http import require_POST
+   ```
+2. Add a new function in ```views.py``` named ```add_product_entry_ajax```
+   ```
+   ...
+   @csrf_exempt
+   @require_POST
+   def add_product_entry_ajax(request):
+       name = strip_tags(request.POST.get("name"))
+       description = strip_tags(request.POST.get("description"))
+       price = strip_tags(request.POST.get("price"))
+       category = strip_tags(request.POST.get("category"))
+       user = request.user
+   
+       new_product = Product(
+           name=name,
+           description=description,
+           price=price,
+           user=user,
+           category=category,
+       )
+       new_product.save()
+   
+       return HttpResponse(b"CREATED", status=201)
+   ...
+   ```
+### Create a /create-ajax/ path that routes to the new view function you created.
+
+1. Import the URL in ```urls.py```
+   ```
+   from main.views import ..., add_product_entry_ajax
+   ```
+2. Add the URL path to ```urlpatterns```
+   ```
+   urlpatterns = [
+    ...
+    path('create-product-entry-ajax', add_product_entry_ajax, name='add_product_entry_ajax'),
+   ]
+   ```
+### Connect the form you created inside the modal to the /create-ajax/ path.
+1. Add a new function in ```<script>``` named ```addProductEntry```.
+   ```
+   function addProductEntry() {
+       const form = document.querySelector('#productEntryForm'); // Define the form variable
+       const formProduct = new FormData(form);
+   
+       fetch("{% url 'main:add_product_entry_ajax' %}", {
+         method: "POST",
+         body: formProduct,
+       })
+       .then(response => {
+         if (response.ok) {
+           refreshProductEntries();
+           form.reset();
+         } else {
+           alert('Failed to add product.');
+         }
+       })
+       .catch(error => {
+         console.error('Error:', error);
+         alert('An error occurred.');
+       });
+   
+       return false;
+     }
+   ```
+2. Add an event listener to the form in the modal to run the ```addProductEntry()``` function with the following code.
+   ```
+   document.getElementById("productEntryForm").addEventListener("submit", (e) => {
+       e.preventDefault();
+       addProductEntry();
+       hideModal();
+   ```
+   
