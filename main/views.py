@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+import json
+from django.http import JsonResponse
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -82,12 +84,15 @@ def login_user(request):
     context = {'form': form}
     return render(request, 'login.html', context)
 
+@login_required(login_url='/login')
 def logout_user(request):
     logout(request)
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
 
+@login_required(login_url='/login')
+@require_POST
 def edit_product(request, id):
     # Get product entry based on id
     product = Product.objects.get(pk = id)
@@ -103,6 +108,8 @@ def edit_product(request, id):
     context = {'form': form}
     return render(request, "edit_product.html", context)
 
+@login_required(login_url='/login')
+@require_POST
 def delete_product(request, id):
     # Get product based on id
     product = Product.objects.get(pk = id)
@@ -111,8 +118,8 @@ def delete_product(request, id):
     # Return to home page
     return HttpResponseRedirect(reverse('main:show_main'))
 
-@csrf_exempt
 @require_POST
+@csrf_exempt
 def add_product_entry_ajax(request):
     name = strip_tags(request.POST.get("name"))
     description = strip_tags(request.POST.get("description"))
@@ -130,3 +137,22 @@ def add_product_entry_ajax(request):
     new_product.save()
 
     return HttpResponse(b"CREATED", status=201)
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+
+        data = json.loads(request.body)
+        new_product = Product.objects.create(
+            user=request.user,
+            name=data["name"],
+            description=data["description"],
+            price=data["price"],
+            category=data["category"],
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
